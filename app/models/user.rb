@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
   validates :email, presence: true,
                         format: { with: VALID_EMAIL_REGEX },
                         uniqueness: { case_sensitive: false }
-  before_save { |user| 
+  before_save { |user|
     user.email = email.downcase
     user.remember_token = SecureRandom.urlsafe_base64
   }
@@ -13,4 +13,10 @@ class User < ActiveRecord::Base
   validates :password_confirmation, presence: true
 
   has_secure_password
+
+  has_many :microposts, dependent: :destroy
+
+  def feed
+    Micropost.where("user_id = ?", id)
+  end
 end
